@@ -69,11 +69,11 @@ def grid_method(
             matrix[i+1][j] = s * matrix[i][j+1] + 2 * (1 - s) * matrix[i][j] + s * matrix[i][j-1] - matrix[i-1][j] + \
                              pow(tau, 2) * f(x_sections[j], y_sections[i])
 
-    print(DataFrame(matrix))
+    print(DataFrame(matrix).to_string())
 
 
 def main():
-    n = 10
+    n = 9
     l = 1
     t = 1
     h = l/n
