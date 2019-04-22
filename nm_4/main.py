@@ -11,11 +11,11 @@ def generate_grid(start: int, end: int, h: float) -> List[float]:
     return result
 
 
-def du_dt_1(t: float, u_1: float, u_2: float) -> float:
+def f1(t: float, u_1: float, u_2: float) -> float:
     return sin(3 * pow(u_1, 2)) + t + u_2
 
 
-def du_dt_2(t: float, u_1: float, u_2: float):
+def f2(t: float, u_1: float, u_2: float):
     return t + u_1 - 3 * pow(u_2, 2) + 1
 
 
@@ -47,14 +47,33 @@ def runge_kutta_method(grid: List[float], u_1_0: float, u_2_0: float, h: float) 
     u_2_result = [u_2_0]
 
     for i in range(len(grid)):
+        # 2 order
+        # k_1_u_1 = u_1_result[i]
+        # k_2_u_1 = du_dt_1(grid[i] + tau, u_1_result[i] + k_1_u_1, u_2_result[i] + k_1_u_1)
+        #
+        # k_1_u_2 = u_2_result[i]
+        # k_2_u_2 = du_dt_2(grid[i] + tau, u_1_result[i] + k_1_u_2, u_2_result[i] + k_1_u_2)
+        #
+        # u_1_next = u_1_result[i] + 0.5 * tau * (k_1_u_1 + k_2_u_1)
+        # u_2_next = u_2_result[i] + 0.5 * tau * (k_1_u_2 + k_2_u_2)
+        #
+        # u_1_result.append(u_1_next)
+        # u_2_result.append(u_2_next)
+        # 4 order
         k_1_u_1 = u_1_result[i]
-        k_2_u_1 = du_dt_1(grid[i] + tau, u_1_result[i] + k_1_u_1, u_2_result[i] + k_1_u_1)
+        k_2_u_1 = f1(grid[i] + tau / 4, u_1_result[i] + (tau * k_1_u_1) / 4, u_2_result[i] + (tau * k_1_u_1) / 4)
+        k_3_u_1 = f1(grid[i] + tau / 2, u_1_result[i] + (tau + k_2_u_1) / 2, u_2_result[i] + (tau * k_2_u_1) / 2)
+        k_4_u_1 = f1(grid[i] + tau, u_1_result[i] + tau * k_1_u_1 - 2 * tau * k_2_u_1 + 2 * tau * k_3_u_1,
+                     u_2_result[i] + tau * k_1_u_1 - 2 * tau * k_2_u_1 + 2 * tau * k_3_u_1)
 
         k_1_u_2 = u_2_result[i]
-        k_2_u_2 = du_dt_2(grid[i] + tau, u_1_result[i] + k_1_u_2, u_2_result[i] + k_1_u_2)
+        k_2_u_2 = f2(grid[i] + tau / 4, u_1_result[i] + (tau * k_1_u_2) / 4, u_2_result[i] + (tau * k_1_u_2) / 4)
+        k_3_u_2 = f2(grid[i] + tau / 2, u_1_result[i] + (tau + k_2_u_2) / 2, u_2_result[i] + (tau * k_2_u_2) / 2)
+        k_4_u_2 = f2(grid[i] + tau, u_1_result[i] + tau * k_1_u_2 - 2 * tau * k_2_u_2 + 2 * tau * k_3_u_2,
+                     u_2_result[i] + tau * k_1_u_2 - 2 * tau * k_2_u_2 + 2 * tau * k_3_u_2)
 
-        u_1_next = u_1_result[i] + 0.5 * tau * (k_1_u_1 + k_2_u_1)
-        u_2_next = u_2_result[i] + 0.5 * tau * (k_2_u_1 + k_2_u_2)
+        u_1_next = tau/6 * (k_1_u_1 + 4*k_3_u_1 + k_4_u_1) + u_1_result[i]
+        u_2_next = tau/6 * (k_1_u_2 + 4*k_3_u_2 + k_4_u_2) + u_2_result[i]
 
         u_1_result.append(u_1_next)
         u_2_result.append(u_2_next)
@@ -68,8 +87,8 @@ def choine_method(grid: List[float], u_1_0: float, u_2_0: float, h: float) -> Tu
     u_2_result = [u_2_0]
 
     for i in range(len(grid)):
-        u_1_i = du_dt_1(grid[i], u_1_result[i], u_2_result[i])
-        u_2_i = du_dt_2(grid[i], u_1_result[i], u_2_result[i])
+        u_1_i = f1(grid[i], u_1_result[i], u_2_result[i])
+        u_2_i = f2(grid[i], u_1_result[i], u_2_result[i])
 
         u_1_next = u_1_result[i] + 0.5 * tau * u_1_result[i] + 0.5 * tau * u_1_i + 0.5 * pow(tau, 2) * u_1_i
         u_2_next = u_2_result[i] + 0.5 * tau * u_2_result[i] + 0.5 * tau * u_2_i + 0.5 * pow(tau, 2) * u_2_i
