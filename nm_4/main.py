@@ -32,8 +32,8 @@ def euler_method(
         u_1 = u_1_result[i-1]
         u_2 = u_2_result[i-1]
 
-        u_1_next = u_1 + h * u_1
-        u_2_next = u_2 + h * u_2
+        u_1_next = u_1 + h * f1(grid[i], u_1, u_2)
+        u_2_next = u_2 + h * f2(grid[i], u_1, u_2)
 
         u_1_result.append(u_1_next)
         u_2_result.append(u_2_next)
@@ -48,32 +48,37 @@ def runge_kutta_method(grid: List[float], u_1_0: float, u_2_0: float, h: float) 
 
     for i in range(len(grid)):
         # 2 order
+        k_1_u_1 = f1(grid[i], u_1_result[i], u_2_result[i])
+        k_2_u_1 = f1(grid[i] + tau, u_1_result[i] + tau * k_1_u_1, u_2_result[i] + tau * k_1_u_1)
+
+        k_1_u_2 = f1(grid[i], u_1_result[i], u_2_result[i])
+        k_2_u_2 = f1(grid[i] + tau, u_1_result[i] + tau * k_1_u_2, u_2_result[i] + tau * k_1_u_2)
         # k_1_u_1 = u_1_result[i]
-        # k_2_u_1 = du_dt_1(grid[i] + tau, u_1_result[i] + k_1_u_1, u_2_result[i] + k_1_u_1)
+        # k_2_u_1 = f1(grid[i] + tau, u_1_result[i] + k_1_u_1, u_2_result[i] + k_1_u_1)
+
+        # k_1_u_2 = u_2_result[i]
+        # k_2_u_2 = f2(grid[i] + tau, u_1_result[i] + k_1_u_2, u_2_result[i] + k_1_u_2)
+
+        u_1_next = u_1_result[i] + 0.5 * tau * (k_1_u_1 + k_2_u_1)
+        u_2_next = u_2_result[i] + 0.5 * tau * (k_1_u_2 + k_2_u_2)
+
+        u_1_result.append(u_1_next)
+        u_2_result.append(u_2_next)
+        # 4 order
+        # k_1_u_1 = u_1_result[i]
+        # k_2_u_1 = f1(grid[i] + tau / 4, u_1_result[i] + (tau * k_1_u_1) / 4, u_2_result[i] + (tau * k_1_u_1) / 4)
+        # k_3_u_1 = f1(grid[i] + tau / 2, u_1_result[i] + (tau + k_2_u_1) / 2, u_2_result[i] + (tau * k_2_u_1) / 2)
+        # k_4_u_1 = f1(grid[i] + tau, u_1_result[i] + tau * k_1_u_1 - 2 * tau * k_2_u_1 + 2 * tau * k_3_u_1,
+        #              u_2_result[i] + tau * k_1_u_1 - 2 * tau * k_2_u_1 + 2 * tau * k_3_u_1)
         #
         # k_1_u_2 = u_2_result[i]
-        # k_2_u_2 = du_dt_2(grid[i] + tau, u_1_result[i] + k_1_u_2, u_2_result[i] + k_1_u_2)
+        # k_2_u_2 = f2(grid[i] + tau / 4, u_1_result[i] + (tau * k_1_u_2) / 4, u_2_result[i] + (tau * k_1_u_2) / 4)
+        # k_3_u_2 = f2(grid[i] + tau / 2, u_1_result[i] + (tau + k_2_u_2) / 2, u_2_result[i] + (tau * k_2_u_2) / 2)
+        # k_4_u_2 = f2(grid[i] + tau, u_1_result[i] + tau * k_1_u_2 - 2 * tau * k_2_u_2 + 2 * tau * k_3_u_2,
+        #              u_2_result[i] + tau * k_1_u_2 - 2 * tau * k_2_u_2 + 2 * tau * k_3_u_2)
         #
-        # u_1_next = u_1_result[i] + 0.5 * tau * (k_1_u_1 + k_2_u_1)
-        # u_2_next = u_2_result[i] + 0.5 * tau * (k_1_u_2 + k_2_u_2)
-        #
-        # u_1_result.append(u_1_next)
-        # u_2_result.append(u_2_next)
-        # 4 order
-        k_1_u_1 = u_1_result[i]
-        k_2_u_1 = f1(grid[i] + tau / 4, u_1_result[i] + (tau * k_1_u_1) / 4, u_2_result[i] + (tau * k_1_u_1) / 4)
-        k_3_u_1 = f1(grid[i] + tau / 2, u_1_result[i] + (tau + k_2_u_1) / 2, u_2_result[i] + (tau * k_2_u_1) / 2)
-        k_4_u_1 = f1(grid[i] + tau, u_1_result[i] + tau * k_1_u_1 - 2 * tau * k_2_u_1 + 2 * tau * k_3_u_1,
-                     u_2_result[i] + tau * k_1_u_1 - 2 * tau * k_2_u_1 + 2 * tau * k_3_u_1)
-
-        k_1_u_2 = u_2_result[i]
-        k_2_u_2 = f2(grid[i] + tau / 4, u_1_result[i] + (tau * k_1_u_2) / 4, u_2_result[i] + (tau * k_1_u_2) / 4)
-        k_3_u_2 = f2(grid[i] + tau / 2, u_1_result[i] + (tau + k_2_u_2) / 2, u_2_result[i] + (tau * k_2_u_2) / 2)
-        k_4_u_2 = f2(grid[i] + tau, u_1_result[i] + tau * k_1_u_2 - 2 * tau * k_2_u_2 + 2 * tau * k_3_u_2,
-                     u_2_result[i] + tau * k_1_u_2 - 2 * tau * k_2_u_2 + 2 * tau * k_3_u_2)
-
-        u_1_next = tau/6 * (k_1_u_1 + 4*k_3_u_1 + k_4_u_1) + u_1_result[i]
-        u_2_next = tau/6 * (k_1_u_2 + 4*k_3_u_2 + k_4_u_2) + u_2_result[i]
+        # u_1_next = tau/6 * (k_1_u_1 + 4*k_3_u_1 + k_4_u_1) + u_1_result[i]
+        # u_2_next = tau/6 * (k_1_u_2 + 4*k_3_u_2 + k_4_u_2) + u_2_result[i]
 
         u_1_result.append(u_1_next)
         u_2_result.append(u_2_next)
@@ -81,22 +86,22 @@ def runge_kutta_method(grid: List[float], u_1_0: float, u_2_0: float, h: float) 
     return u_1_result, u_2_result
 
 
-def choine_method(grid: List[float], u_1_0: float, u_2_0: float, h: float) -> Tuple[List[float], List[float]]:
+def choine_method(t: List[float], u_1_0: float, u_2_0: float, h: float) -> Tuple[List[float], List[float]]:
     tau = h/2
-    u_1_result = [u_1_0]
-    u_2_result = [u_2_0]
+    u1 = [u_1_0]
+    u2 = [u_2_0]
 
-    for i in range(len(grid)):
-        f_1_i = f1(grid[i], u_1_result[i], u_2_result[i])
-        f_2_i = f2(grid[i], u_1_result[i], u_2_result[i])
+    for i in range(len(t)-1):
+        y_next_1 = u1[i] + tau * f1(t[i], u1[i], u2[i])
+        y_next_2 = u2[i] + tau * f2(t[i], u1[i], u2[i])
 
-        u_1_next = u_1_result[i] + 0.5*tau*f_1_i + 0.5*tau*f1(grid[i], tau*f_1_i + u_1_result[i], u_2_result[i])
-        u_2_next = u_2_result[i] + 0.5*tau*f_2_i + 0.5*tau*f2(grid[i], u_1_result[i], tau*f_2_i + u_2_result[i])
+        u_1_next = u1[i]+0.5*tau*(f1(t[i], u1[i], u2[i]) + f1(t[i+1], y_next_1, y_next_2))
+        u_2_next = u2[i]+0.5*tau*(f2(t[i], u1[i], u2[i]) + f2(t[i+1], y_next_1, y_next_2))
 
-        u_1_result.append(u_1_next)
-        u_2_result.append(u_2_next)
+        u1.append(u_1_next)
+        u2.append(u_2_next)
 
-    return u_1_result, u_2_result
+    return u1, u2
 
 
 def pretty_print(grid: List[float], u_1_result: List[float], u_2_result: List[float], method_name: str):
@@ -123,7 +128,7 @@ def main():
     u_1_result, u_2_result = runge_kutta_method(grid=grid, u_1_0=u_1_0, u_2_0=u_2_0, h=h)
     pretty_print(grid, u_1_result, u_2_result, "Runge-Kutta method")
 
-    u_1_result, u_2_result = choine_method(grid=grid, u_1_0=u_1_0, u_2_0=u_2_0, h=h)
+    u_1_result, u_2_result = choine_method(t=grid, u_1_0=u_1_0, u_2_0=u_2_0, h=h)
     pretty_print(grid, u_1_result, u_2_result, "Choine method")
 
 
