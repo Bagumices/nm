@@ -87,11 +87,11 @@ def choine_method(grid: List[float], u_1_0: float, u_2_0: float, h: float) -> Tu
     u_2_result = [u_2_0]
 
     for i in range(len(grid)):
-        u_1_i = f1(grid[i], u_1_result[i], u_2_result[i])
-        u_2_i = f2(grid[i], u_1_result[i], u_2_result[i])
+        f_1_i = f1(grid[i], u_1_result[i], u_2_result[i])
+        f_2_i = f2(grid[i], u_1_result[i], u_2_result[i])
 
-        u_1_next = u_1_result[i] + 0.5 * tau * u_1_result[i] + 0.5 * tau * u_1_i + 0.5 * pow(tau, 2) * u_1_i
-        u_2_next = u_2_result[i] + 0.5 * tau * u_2_result[i] + 0.5 * tau * u_2_i + 0.5 * pow(tau, 2) * u_2_i
+        u_1_next = u_1_result[i] + 0.5*tau*f_1_i + 0.5*tau*f1(grid[i], tau*f_1_i + u_1_result[i], u_2_result[i])
+        u_2_next = u_2_result[i] + 0.5*tau*f_2_i + 0.5*tau*f2(grid[i], u_1_result[i], tau*f_2_i + u_2_result[i])
 
         u_1_result.append(u_1_next)
         u_2_result.append(u_2_next)
