@@ -1,7 +1,5 @@
 from typing import List, Tuple
 
-from pandas import DataFrame
-
 
 def generate_t_grid(m: int, t: float) -> List[float]:
     tau = t / (m-1)
